@@ -21,6 +21,15 @@ class AddTasksEvent extends TasksEvent {
   List<Object?> get props => [dueDate, task, isTaskCompleted];
 }
 
+class UpdateTasksEvent extends TasksEvent {
+  final TaskTemplate task;
+  final bool isTaskCompleted;
+  UpdateTasksEvent({this.isTaskCompleted = false, required this.task});
+
+  @override
+  List<Object?> get props => [isTaskCompleted, task];
+}
+
 class CompleteTasksEvent extends TasksEvent {
   final TaskTemplate task;
   CompleteTasksEvent({required this.task});

@@ -16,7 +16,7 @@ class TaskService with BaseService implements ITaskService {
       final response = await request(
         'MJ-Todo',
         requestType: RequestType.post,
-        body: task,
+        body: task.toJson(),
       );
 
       return TaskTemplate.fromJson(response);
@@ -39,6 +39,31 @@ class TaskService with BaseService implements ITaskService {
           .toList();
     } catch (e) {
       log("Failed to get task: $e");
+      rethrow;
+    }
+  }
+
+  @override
+  Future<TaskTemplate> updateTask(
+      {String? id,
+      required String title,
+      required DateTime dueDate,
+      bool? isTaskCompleted}) async {
+    final task = TaskTemplate(
+        title: title,
+        dueDate: dueDate,
+        isTaskCompleted: isTaskCompleted ?? false);
+
+    try {
+      final response = await request(
+        'MJ-Todo/$id',
+        requestType: RequestType.patch,
+        body: task.toJson(),
+      );
+
+      return TaskTemplate.fromJson(response);
+    } catch (e) {
+      log("Failed to update task: $e");
       rethrow;
     }
   }

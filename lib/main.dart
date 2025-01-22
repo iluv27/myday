@@ -5,8 +5,9 @@ import 'package:myday/home/home.dart';
 import 'package:myday/theme/theme.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(BlocProvider(
-    create: (context) => TasksBloc(),
+    create: (context) => TasksBloc()..add(InitTasksEvent()),
     child: const MyApp(),
   ));
 }

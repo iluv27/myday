@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:myday/constants/tasks.dart';
 import 'package:myday/home/services/i_task_service.dart';
 
@@ -15,7 +17,24 @@ mixin TasksProvider {
   }
 
   Future<List<TaskTemplate>> getTasks() async {
-    return await ITaskService.instance.getTasks();
+    try {
+      return await ITaskService.instance.getTasks();
+    } catch (e) {
+      log('Error fetching tasks: $e');
+      throw Exception('Failed to load tasks');
+    }
+  }
+
+  Future<void> updateTask({
+    required String title,
+    required DateTime dueDate,
+    required bool isTaskDone,
+  }) async {
+    await ITaskService.instance.updateTask(
+      title: title,
+      dueDate: dueDate,
+      isTaskCompleted: isTaskDone,
+    );
   }
 
   Future deleteTask() async {

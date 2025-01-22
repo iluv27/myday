@@ -10,7 +10,8 @@ final class InitialTasksState extends TasksState {
 
 class LoadingTasksState extends TasksState {
   final bool isLoading;
-  LoadingTasksState({required this.isLoading});
+
+  LoadingTasksState({this.isLoading = false});
 
   @override
   List<Object?> get props => [isLoading];
@@ -18,10 +19,15 @@ class LoadingTasksState extends TasksState {
 
 final class LoadedTasksState extends TasksState {
   final List<TaskTemplate> tasks;
-  LoadedTasksState({required this.tasks});
+//  final bool isTaskCompleted;
+  LoadedTasksState({
+    required this.tasks,
+  });
 
   @override
-  List<Object?> get props => [tasks];
+  List<Object?> get props => [
+        tasks,
+      ];
 }
 
 final class ErrorTasksState extends TasksState {

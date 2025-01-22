@@ -24,6 +24,14 @@ abstract class ITaskService {
     throw UnimplementedError('task could not be gotten from the backend');
   }
 
+  Future<TaskTemplate> updateTask({
+    required String title,
+    required DateTime dueDate,
+    bool isTaskCompleted = false,
+  }) {
+    throw UnimplementedError('task unable to be created');
+  }
+
   Future<TaskTemplate> deleteTasks() {
     throw UnimplementedError('task could not be deleted');
   }

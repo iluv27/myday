@@ -8,47 +8,25 @@ import 'package:myday/home/bloc/tasks_provider.dart';
 part 'tasks_event.dart';
 part 'tasks_state.dart';
 
-enum TasksCreated {
-  tasksPage,
-  createTasksPage,
-}
-
 class TasksBloc extends Bloc<TasksEvent, TasksState> with TasksProvider {
   TasksBloc() : super(InitialTasksState()) {
-    // ignore: unused_local_variable
-    TasksCreated tasksCreated = TasksCreated.tasksPage;
+    on<InitTasksEvent>(_onInit);
 
-    on<InitTasksEvent>((event, emit) async {
-      tasksCreated = TasksCreated.tasksPage;
-      try {
-        final tasks = await getTasks();
+    on<AddTasksEvent>(_addTaskEvent);
 
-        emit(LoadedTasksState(tasks: tasks));
-      } catch (e) {
-        emit(ErrorTasksState(error: e.toString()));
-      }
-    });
-
-    on<AddTasksEvent>((event, emit) async {
-      try {
-        await writeTask(
-          title: event.task,
-          dueDate: event.dueDate,
-          isTaskDone: event.isTaskCompleted,
-        );
-        final tasks = await getTasks();
-        emit(LoadedTasksState(tasks: tasks));
-      } catch (e) {
-        emit(ErrorTasksState(error: e.toString()));
-      }
-
-      tasksCreated = TasksCreated.tasksPage;
-    });
+    on<UpdateTasksEvent>(_updateTaskEvent);
 
     on<CompleteTasksEvent>((event, emit) async {
-      final tasks = await getTasks();
+      try {
+        emit(LoadingTasksState(isLoading: true));
 
-      emit(LoadedTasksState(tasks: tasks));
+        final task = await getTasks();
+        emit(LoadedTasksState(
+          tasks: task,
+        ));
+      } catch (e) {
+        emit(ErrorTasksState(error: e.toString()));
+      }
     });
 
     on<DeleteTasksEvent>((event, emit) async {
@@ -56,10 +34,57 @@ class TasksBloc extends Bloc<TasksEvent, TasksState> with TasksProvider {
         await deleteTask();
         final tasks = await getTasks();
         tasks.remove(event.taskTemplate);
-        emit(LoadedTasksState(tasks: tasks));
       } catch (e) {
         emit(ErrorTasksState(error: e.toString()));
       }
     });
+  }
+
+  List<TaskTemplate> _tasks = [];
+  List<TaskTemplate> get tasks => _tasks;
+
+  Future _onInit(InitTasksEvent event, Emitter<TasksState> emit) async {
+    try {
+      emit(LoadingTasksState(isLoading: true)); // Emit loading state
+
+      _tasks = await getTasks(); // Fetch tasks from provider
+
+      emit(LoadedTasksState(tasks: tasks)); // Emit loaded state
+    } catch (e) {
+      emit(ErrorTasksState(error: e.toString())); // Emit error state
+    }
+  }
+
+  Future _addTaskEvent(AddTasksEvent event, Emitter<TasksState> emit) async {
+    try {
+      await writeTask(
+        title: event.task,
+        dueDate: event.dueDate,
+        isTaskDone: event.isTaskCompleted,
+      );
+      emit(LoadingTasksState(isLoading: true));
+      _tasks = await getTasks();
+      emit(LoadedTasksState(tasks: tasks));
+    } catch (e) {
+      emit(ErrorTasksState(error: e.toString()));
+    }
+  }
+
+  Future _updateTaskEvent(
+      UpdateTasksEvent event, Emitter<TasksState> emit) async {
+    try {
+      await updateTask(
+        title: event.task.title,
+        dueDate: event.task.dueDate,
+        isTaskDone: event.isTaskCompleted,
+      );
+      emit(LoadingTasksState(isLoading: true));
+      _tasks = await getTasks();
+      emit(LoadedTasksState(
+        tasks: tasks,
+      ));
+    } catch (e) {
+      emit(ErrorTasksState(error: e.toString()));
+    }
   }
 }

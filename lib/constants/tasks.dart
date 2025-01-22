@@ -6,8 +6,16 @@ class TaskTemplate {
   TaskTemplate({
     required this.title,
     required this.dueDate,
-    this.isTaskCompleted = false,
+    required this.isTaskCompleted,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'title': title,
+      'due_time': dueDate.millisecondsSinceEpoch,
+      'status': isTaskCompleted,
+    };
+  }
 
   factory TaskTemplate.fromJson(Map<String, dynamic> json) {
     return TaskTemplate(
@@ -18,4 +26,10 @@ class TaskTemplate {
       isTaskCompleted: json['status'] as bool,
     );
   }
+
+  Json? _$JsonConverterToJson<Json, Value>(
+  Value? value,
+  Json? Function(Value value) toJson,
+) =>
+    value == null ? null : toJson(value);
 }

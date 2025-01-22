@@ -1,5 +1,7 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:myday/constants/toast.dart';
 import 'package:myday/home/bloc/tasks_bloc.dart';
 import 'package:myday/home/create_task.dart';
 import 'package:myday/theme/theme.dart';
@@ -7,18 +9,30 @@ import 'package:myday/theme/theme.dart';
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
-  final bool taskDone = false;
+  void _listener(BuildContext context, TasksState state) {
+    if (state is LoadingTasksState) {
+      //Error state
+      if (state is ErrorTasksState) {
+        AppToast.show('Error in creating tasks. Please try again', error: true);
+      }
+      //Success state
+      if (state is LoadedTasksState) {
+        AppToast.show('Tasks created successfully');
+      }
+    }
+
+    // bool isTaskDone(int index) {
+    //   bool isTaskDone = task.isTaskCompleted;
+    // }
+  }
 
   @override
   Widget build(BuildContext context) {
-    context.read<TasksBloc>().add(InitTasksEvent());
-
     return SafeArea(
       child: BlocConsumer<TasksBloc, TasksState>(
-        listener: (context, state) {
-          // TODO: implement listener
-        },
+        listener: _listener,
         builder: (context, state) {
+          final bloc = context.read<TasksBloc>();
           return Scaffold(
             appBar: AppBar(
               title: Icon(
@@ -58,6 +72,10 @@ class HomePage extends StatelessWidget {
                   SizedBox(
                     height: 50,
                   ),
+                  if (state is LoadingTasksState)
+                    Center(
+                      child: CircularProgressIndicator(),
+                    ),
                   if (state is LoadedTasksState)
                     state.tasks.isEmpty
                         ? Container(
@@ -93,50 +111,46 @@ class HomePage extends StatelessWidget {
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 10.0),
                                   child: CheckboxListTile(
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(10))),
-                                      tileColor: AppColors.bgDark,
-                                      title: Text(
-                                        task.title,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium,
-                                      ),
-                                      subtitle: Text(
-                                        formattedDueDate,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall,
-                                      ),
-                                      checkboxScaleFactor: 1.6,
-                                      checkboxShape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(5))),
-                                      controlAffinity:
-                                          ListTileControlAffinity.leading,
-                                      value: task.isTaskCompleted,
-                                      selected: task.isTaskCompleted,
-                                      secondary: Icon(
-                                        Icons.emoji_emotions_rounded,
-                                        color: Colors.grey,
-                                      ),
-                                      onChanged: (bool? value) {
-                                        if (value != null) {
-                                          // Update task completion status through Bloc
-                                          context.read<TasksBloc>().add(
-                                                CompleteTasksEvent(task: task),
-                                              );
-                                        }
-                                      }),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10))),
+                                    tileColor: AppColors.bgDark,
+                                    title: Text(
+                                      task.title,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium,
+                                    ),
+                                    subtitle: Text(
+                                      formattedDueDate,
+                                      style:
+                                          Theme.of(context).textTheme.bodySmall,
+                                    ),
+                                    checkboxScaleFactor: 1.6,
+                                    checkboxShape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(5))),
+                                    controlAffinity:
+                                        ListTileControlAffinity.leading,
+                                    value: task.isTaskCompleted,
+                                    selected: task.isTaskCompleted,
+                                    secondary: Icon(
+                                      Icons.emoji_emotions_rounded,
+                                      color: Colors.grey,
+                                    ),
+                                    onChanged: (bool? value) {
+                                      task.isTaskCompleted == value;
+
+                                      bloc.add(UpdateTasksEvent(task: task));
+                                      debugPrint(
+                                          'Task bool: ${task.isTaskCompleted}');
+                                      log('Value: $value');
+                                    },
+                                  ),
                                 );
                               },
                             ),
                           ),
-                  if (state is LoadingTasksState)
-                    Center(
-                      child: CircularProgressIndicator(),
-                    ),
                 ],
               ),
             ),
