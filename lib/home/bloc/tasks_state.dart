@@ -19,15 +19,11 @@ class LoadingTasksState extends TasksState {
 
 final class LoadedTasksState extends TasksState {
   final List<TaskTemplate> tasks;
-//  final bool isTaskCompleted;
   LoadedTasksState({
     required this.tasks,
   });
-
   @override
-  List<Object?> get props => [
-        tasks,
-      ];
+  List<Object?> get props => [tasks];
 }
 
 final class ErrorTasksState extends TasksState {

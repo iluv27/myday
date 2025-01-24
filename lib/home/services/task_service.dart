@@ -45,20 +45,14 @@ class TaskService with BaseService implements ITaskService {
 
   @override
   Future<TaskTemplate> updateTask(
-      {String? id,
-      required String title,
-      required DateTime dueDate,
-      bool? isTaskCompleted}) async {
-    final task = TaskTemplate(
-        title: title,
-        dueDate: dueDate,
-        isTaskCompleted: isTaskCompleted ?? false);
-
+      {String? id, required bool isTaskCompleted}) async {
     try {
       final response = await request(
-        'MJ-Todo/$id',
+        'MJ-Todo/$id', // Assuming `taskId` is part of the endpoint
         requestType: RequestType.patch,
-        body: task.toJson(),
+        body: {
+          'status': isTaskCompleted, // Only update this field
+        },
       );
 
       return TaskTemplate.fromJson(response);

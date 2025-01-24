@@ -106,7 +106,7 @@ class HomePage extends StatelessWidget {
                               itemBuilder: (context, index) {
                                 final task = state.tasks[index];
                                 final formattedDueDate =
-                                    "${task.dueDate.hour}:${task.dueDate.minute < 10 ? '0' : ''}${task.dueDate.minute} ${task.dueDate.hour < 12 ? 'AM' : 'PM'}";
+                                    "${task.dueDate!.hour}:${task.dueDate!.minute < 10 ? '0' : ''}${task.dueDate!.minute} ${task.dueDate!.hour < 12 ? 'AM' : 'PM'}";
 
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 10.0),
@@ -116,7 +116,7 @@ class HomePage extends StatelessWidget {
                                             Radius.circular(10))),
                                     tileColor: AppColors.bgDark,
                                     title: Text(
-                                      task.title,
+                                      task.title.toString(),
                                       style: Theme.of(context)
                                           .textTheme
                                           .bodyMedium,
@@ -136,15 +136,15 @@ class HomePage extends StatelessWidget {
                                     selected: task.isTaskCompleted,
                                     secondary: Icon(
                                       Icons.emoji_emotions_rounded,
-                                      color: Colors.grey,
+                                      color: task.isTaskCompleted
+                                          ? Colors.green
+                                          : Colors.grey,
                                     ),
                                     onChanged: (bool? value) {
-                                      task.isTaskCompleted == value;
-
-                                      bloc.add(UpdateTasksEvent(task: task));
-                                      debugPrint(
-                                          'Task bool: ${task.isTaskCompleted}');
-                                      log('Value: $value');
+                                      bloc.add(UpdateTasksEvent(
+                                          id: task.id!,
+                                          isTaskCompleted: value!));
+                                      // bloc.add(CompleteTasksEvent(task: task));
                                     },
                                   ),
                                 );

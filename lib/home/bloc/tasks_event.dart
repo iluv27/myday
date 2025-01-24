@@ -22,12 +22,12 @@ class AddTasksEvent extends TasksEvent {
 }
 
 class UpdateTasksEvent extends TasksEvent {
-  final TaskTemplate task;
+  final String id;
   final bool isTaskCompleted;
-  UpdateTasksEvent({this.isTaskCompleted = false, required this.task});
+  UpdateTasksEvent({required this.id, this.isTaskCompleted = false});
 
   @override
-  List<Object?> get props => [isTaskCompleted, task];
+  List<Object?> get props => [id, isTaskCompleted];
 }
 
 class CompleteTasksEvent extends TasksEvent {

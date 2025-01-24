@@ -24,11 +24,7 @@ abstract class ITaskService {
     throw UnimplementedError('task could not be gotten from the backend');
   }
 
-  Future<TaskTemplate> updateTask({
-    required String title,
-    required DateTime dueDate,
-    bool isTaskCompleted = false,
-  }) {
+  Future<TaskTemplate> updateTask({String? id, required bool isTaskCompleted}) {
     throw UnimplementedError('task unable to be created');
   }
 

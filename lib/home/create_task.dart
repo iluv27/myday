@@ -4,13 +4,14 @@ import 'package:myday/home/bloc/tasks_bloc.dart';
 import 'package:myday/theme/theme.dart';
 import 'package:intl/intl.dart'; // For date formatting
 
+final TextEditingController dateController = TextEditingController();
+
 class CreateTask extends StatelessWidget {
   const CreateTask({super.key});
 
   @override
   Widget build(BuildContext context) {
     final TextEditingController titleController = TextEditingController();
-    final TextEditingController dateController = TextEditingController();
 
     // Format the current date
     final DateFormat dateFormatter = DateFormat('yyyy-MM-dd HH:mm');

@@ -25,16 +25,15 @@ mixin TasksProvider {
     }
   }
 
-  Future<void> updateTask({
-    required String title,
-    required DateTime dueDate,
+  Future<TaskTemplate> updateTask({
+    String? id,
     required bool isTaskDone,
   }) async {
-    await ITaskService.instance.updateTask(
-      title: title,
-      dueDate: dueDate,
+    final updated = await ITaskService.instance.updateTask(
+      id: id,
       isTaskCompleted: isTaskDone,
     );
+    return updated;
   }
 
   Future deleteTask() async {

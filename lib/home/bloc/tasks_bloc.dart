@@ -8,13 +8,33 @@ import 'package:myday/home/bloc/tasks_provider.dart';
 part 'tasks_event.dart';
 part 'tasks_state.dart';
 
+enum ToggleScheme { toggle }
+
 class TasksBloc extends Bloc<TasksEvent, TasksState> with TasksProvider {
   TasksBloc() : super(InitialTasksState()) {
     on<InitTasksEvent>(_onInit);
 
     on<AddTasksEvent>(_addTaskEvent);
 
-    on<UpdateTasksEvent>(_updateTaskEvent);
+    on<UpdateTasksEvent>((event, emit) async {
+      try {
+        emit(LoadingTasksState(isLoading: true));
+
+        final task = await getTasks();
+
+        final updatedTodos = await Future.wait(task.map((tasksingle) async {
+          final updated = await updateTask(
+              id: tasksingle.id, isTaskDone: !tasksingle.isTaskCompleted);
+          return updated;
+        }).toList());
+
+        emit(LoadedTasksState(
+          tasks: updatedTodos,
+        ));
+      } catch (e) {
+        emit(ErrorTasksState(error: e.toString()));
+      }
+    });
 
     on<CompleteTasksEvent>((event, emit) async {
       try {
@@ -65,24 +85,6 @@ class TasksBloc extends Bloc<TasksEvent, TasksState> with TasksProvider {
       emit(LoadingTasksState(isLoading: true));
       _tasks = await getTasks();
       emit(LoadedTasksState(tasks: tasks));
-    } catch (e) {
-      emit(ErrorTasksState(error: e.toString()));
-    }
-  }
-
-  Future _updateTaskEvent(
-      UpdateTasksEvent event, Emitter<TasksState> emit) async {
-    try {
-      await updateTask(
-        title: event.task.title,
-        dueDate: event.task.dueDate,
-        isTaskDone: event.isTaskCompleted,
-      );
-      emit(LoadingTasksState(isLoading: true));
-      _tasks = await getTasks();
-      emit(LoadedTasksState(
-        tasks: tasks,
-      ));
     } catch (e) {
       emit(ErrorTasksState(error: e.toString()));
     }

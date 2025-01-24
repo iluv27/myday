@@ -1,24 +1,30 @@
 class TaskTemplate {
-  final String title;
-  final DateTime dueDate;
+  final String? id;
+  final String? title;
+  final DateTime? dueDate;
   bool isTaskCompleted;
 
   TaskTemplate({
-    required this.title,
-    required this.dueDate,
-    required this.isTaskCompleted,
+    this.id,
+    this.title,
+    this.dueDate,
+    this.isTaskCompleted = false,
   });
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'title': title,
-      'due_time': dueDate.millisecondsSinceEpoch,
+      'due_time': dueDate is int
+          ? DateTime.fromMillisecondsSinceEpoch(dueDate as int)
+          : DateTime.parse(dueDate as String),
       'status': isTaskCompleted,
     };
   }
 
   factory TaskTemplate.fromJson(Map<String, dynamic> json) {
     return TaskTemplate(
+      id: json['id'] as String,
       title: json['title'] as String,
       dueDate: json['due_time'] is int
           ? DateTime.fromMillisecondsSinceEpoch(json['due_time'] * 1000)
@@ -26,10 +32,4 @@ class TaskTemplate {
       isTaskCompleted: json['status'] as bool,
     );
   }
-
-  Json? _$JsonConverterToJson<Json, Value>(
-  Value? value,
-  Json? Function(Value value) toJson,
-) =>
-    value == null ? null : toJson(value);
 }
