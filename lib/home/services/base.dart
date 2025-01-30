@@ -51,9 +51,6 @@ mixin BaseService {
         final message = b['message'] ?? "An error occurred";
         throw HttpException(message);
       }
-
-      log("EE");
-      log(response.statusCode.toString());
       return json.decode(response.body);
     } catch (e) {
       log("Exception::::: ${e.toString()}");

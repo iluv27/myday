@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 abstract class AppColors {
   static const bgLight = Color(0xfff6f6f6);
   static const bgDark = Color.fromARGB(255, 29, 1, 43);
-  static const primary = Color(0xFF80B9FF);
+  static const primary = Color(0xFF53FF59);
   static const onPrimary = Color(0x00A5FF4C);
   static const secondary = Color(0xFF5900FF);
   static const onSecondary = Color(0xA35900FF);
@@ -40,7 +40,7 @@ ThemeData customTheme = ThemeData(
       Color(0xffffffff),
     ),
     checkColor: WidgetStatePropertyAll(
-      AppColors.primary,
+      const Color(0xFF52C455),
     ),
   ),
 );

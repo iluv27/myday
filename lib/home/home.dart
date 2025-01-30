@@ -1,28 +1,23 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:myday/constants/toast.dart';
 import 'package:myday/home/bloc/tasks_bloc.dart';
 import 'package:myday/home/create_task.dart';
 import 'package:myday/theme/theme.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   void _listener(BuildContext context, TasksState state) {
-    if (state is LoadingTasksState) {
-      //Error state
-      if (state is ErrorTasksState) {
-        AppToast.show('Error in creating tasks. Please try again', error: true);
-      }
-      //Success state
-      if (state is LoadedTasksState) {
-        AppToast.show('Tasks created successfully');
-      }
-    }
-
-    // bool isTaskDone(int index) {
-    //   bool isTaskDone = task.isTaskCompleted;
+    // if (state is LoadingTasksState) {
+    //   //Error state
+    //   if (state is ErrorTasksState) {
+    //     AppToast.show('Error in creating tasks. Please try again', error: true);
+    //   }
+    //   //Success state
+    //   if (state is LoadedTasksState) {
+    //     AppToast.show('Tasks created successfully');
+    //   }
     // }
   }
 
@@ -35,8 +30,9 @@ class HomePage extends StatelessWidget {
           final bloc = context.read<TasksBloc>();
           return Scaffold(
             appBar: AppBar(
-              title: Icon(
-                Icons.menu_rounded,
+              title: Image.asset(
+                'image/logo.png',
+                scale: 4.5,
               ),
               actions: [
                 IconButton(
@@ -52,15 +48,12 @@ class HomePage extends StatelessWidget {
             body: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  SizedBox(
-                    width: 200,
-                    child: Text(
-                      'Hello!!',
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
+                  Text(
+                    'Hello!!',
+                    style: Theme.of(context).textTheme.headlineMedium,
                   ),
                   SizedBox(
                     height: 10,
@@ -110,42 +103,85 @@ class HomePage extends StatelessWidget {
 
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 10.0),
-                                  child: CheckboxListTile(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(10))),
-                                    tileColor: AppColors.bgDark,
-                                    title: Text(
-                                      task.title.toString(),
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium,
+                                  child: Slidable(
+                                    key: ValueKey(task),
+                                    endActionPane: ActionPane(
+                                      motion: const ScrollMotion(),
+                                      dismissible:
+                                          DismissiblePane(onDismissed: () {
+                                        bloc.add(DeleteTasksEvent(
+                                            id: task.id.toString()));
+                                      }),
+                                      children: [
+                                        SlidableAction(
+                                          onPressed: (context) {
+                                            bloc.add(DeleteTasksEvent(
+                                                id: task.id.toString()));
+                                          },
+                                          backgroundColor: Colors.red,
+                                          foregroundColor: Colors.white,
+                                          icon: Icons.delete,
+                                          label: 'Delete',
+                                        ),
+                                      ],
                                     ),
-                                    subtitle: Text(
-                                      formattedDueDate,
-                                      style:
-                                          Theme.of(context).textTheme.bodySmall,
+                                    child: CheckboxListTile(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10))),
+                                      tileColor: AppColors.bgDark,
+                                      title: Text(
+                                        task.title.toString(),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium,
+                                      ),
+                                      subtitle: Text(
+                                        formattedDueDate,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall,
+                                      ),
+                                      checkboxScaleFactor: 1.6,
+                                      checkboxShape: RoundedRectangleBorder(
+                                          side: BorderSide(
+                                            width: 1,
+                                            color: task.isTaskCompleted
+                                                ? AppColors.primary
+                                                : Colors.transparent,
+                                          ),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(5))),
+                                      controlAffinity:
+                                          ListTileControlAffinity.leading,
+                                      value: task.isTaskCompleted,
+                                      selected: task.isTaskCompleted,
+                                      secondary: Icon(
+                                        size: 30,
+                                        task.isTaskCompleted
+                                            ? Icons
+                                                .sentiment_very_satisfied_rounded
+                                            : Icons.sentiment_neutral_rounded,
+                                        color: task.isTaskCompleted
+                                            ? AppColors.primary
+                                            : Colors.grey,
+                                      ),
+                                      onChanged: (bool? value) {
+                                        if (value != null) {
+                                          // Optimistically update UI first
+                                          bloc.add(OptimisticUpdateTasksEvent(
+                                            id: task.id!,
+                                            isTaskCompleted: value,
+                                          ));
+
+                                          bloc.add(UpdateTasksEvent(
+                                            id: task
+                                                .id!, // Ensure you're using the unique ID
+                                            isTaskCompleted: value,
+                                          ));
+                                        }
+                                      },
                                     ),
-                                    checkboxScaleFactor: 1.6,
-                                    checkboxShape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(5))),
-                                    controlAffinity:
-                                        ListTileControlAffinity.leading,
-                                    value: task.isTaskCompleted,
-                                    selected: task.isTaskCompleted,
-                                    secondary: Icon(
-                                      Icons.emoji_emotions_rounded,
-                                      color: task.isTaskCompleted
-                                          ? Colors.green
-                                          : Colors.grey,
-                                    ),
-                                    onChanged: (bool? value) {
-                                      bloc.add(UpdateTasksEvent(
-                                          id: task.id!,
-                                          isTaskCompleted: value!));
-                                      // bloc.add(CompleteTasksEvent(task: task));
-                                    },
                                   ),
                                 );
                               },

@@ -30,16 +30,16 @@ class UpdateTasksEvent extends TasksEvent {
   List<Object?> get props => [id, isTaskCompleted];
 }
 
-class CompleteTasksEvent extends TasksEvent {
-  final TaskTemplate task;
-  CompleteTasksEvent({required this.task});
-  @override
-  List<Object?> get props => [task];
+class OptimisticUpdateTasksEvent extends TasksEvent {
+  final String id;
+  final bool isTaskCompleted;
+
+  OptimisticUpdateTasksEvent({required this.id, required this.isTaskCompleted});
 }
 
 class DeleteTasksEvent extends TasksEvent {
-  final TaskTemplate taskTemplate;
-  DeleteTasksEvent({required this.taskTemplate});
+  final String id;
+  DeleteTasksEvent({required this.id});
   @override
-  List<Object?> get props => [taskTemplate];
+  List<Object?> get props => [id];
 }

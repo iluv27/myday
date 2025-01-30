@@ -1,3 +1,5 @@
+import 'package:myday/home/bloc/tasks_bloc.dart';
+
 class TaskTemplate {
   final String? id;
   final String? title;
@@ -30,6 +32,20 @@ class TaskTemplate {
           ? DateTime.fromMillisecondsSinceEpoch(json['due_time'] * 1000)
           : DateTime.parse(json['due_time']),
       isTaskCompleted: json['status'] as bool,
+    );
+  }
+
+  TaskTemplate copyWith({
+    required bool isTaskCompleted,
+    final String? id,
+    final String? title,
+    final DateTime? dueDate,
+  }) {
+    return TaskTemplate(
+      id: id,
+      title: title,
+      dueDate: dueDate,
+      isTaskCompleted: isTaskCompleted,
     );
   }
 }

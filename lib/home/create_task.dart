@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:myday/constants/toast.dart';
 import 'package:myday/home/bloc/tasks_bloc.dart';
 import 'package:myday/theme/theme.dart';
 import 'package:intl/intl.dart'; // For date formatting
@@ -12,35 +13,47 @@ class CreateTask extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextEditingController titleController = TextEditingController();
+    final TextEditingController dateController = TextEditingController();
+    final TextEditingController timeController = TextEditingController();
+    final DateFormat dateFormatter = DateFormat('yyyy-MM-dd');
+    final DateFormat timeFormatter = DateFormat('HH:mm');
 
-    // Format the current date
-    final DateFormat dateFormatter = DateFormat('yyyy-MM-dd HH:mm');
-    final DateTime currentDate = DateTime.now();
-    dateController.text =
-        dateFormatter.format(currentDate); // Default current date
+    // final DateTime currentDate = DateTime.now();
+    // dateController.text =
+    //     dateFormatter.format(currentDate); // Default current date
 
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(Icons.arrow_back_ios_new_rounded),
+        leadingWidth: 40,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              size: 24,
+            ),
+          ),
         ),
         title: Text(
           'Create Task',
-          style: Theme.of(context).textTheme.headlineMedium,
+          style: Theme.of(context)
+              .textTheme
+              .headlineMedium!
+              .copyWith(fontSize: 22, fontWeight: FontWeight.w600),
         ),
         actions: [
           IconButton(
             onPressed: () {},
-            icon: Icon(Icons.edit_document),
+            icon: Icon(Icons.edit_note_rounded),
           ),
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -54,14 +67,25 @@ class CreateTask extends StatelessWidget {
               controller: titleController,
               decoration: InputDecoration(
                 hintText: 'Enter task title',
-                hintStyle: Theme.of(context).textTheme.bodyMedium,
+                hintStyle: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .copyWith(color: Colors.grey, fontSize: 14),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.white),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.white),
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(color: Colors.white),
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 30),
 
             // Due Date input
             Text(
@@ -69,80 +93,140 @@ class CreateTask extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             SizedBox(height: 10),
-            TextField(
-              controller: dateController,
-              keyboardType: TextInputType.datetime,
-              decoration: InputDecoration(
-                hintText: 'Select due date and time',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(
+                  width: MediaQuery.sizeOf(context).width * 0.4,
+                  child: TextField(
+                      controller: dateController,
+                      keyboardType: TextInputType.datetime,
+                      decoration: InputDecoration(
+                        hintText: '00 - 00 - 00',
+                        suffixIcon: Icon(Icons.calendar_today),
+                        hintStyle: Theme.of(context)
+                            .textTheme
+                            .bodyMedium!
+                            .copyWith(color: Colors.grey, fontSize: 14),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                      ),
+                      onTap: () async {
+                        // Show date picker and time picker
+                        final DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2101),
+                        );
+
+                        if (pickedDate != null) {
+                          dateController.text =
+                              dateFormatter.format(pickedDate);
+                          // ignore: unused_local_variable
+                          final TimeOfDay? pickedTime = await showTimePicker(
+                            // ignore: use_build_context_synchronously
+                            context: context,
+                            initialTime: TimeOfDay.fromDateTime(DateTime.now()),
+                          );
+
+                          dateController.text =
+                              dateFormatter.format(pickedDate);
+                        }
+                      }),
                 ),
-                suffixIcon: Icon(Icons.calendar_today),
-              ),
-              onTap: () async {
-                // Show date picker and time picker
-                final DateTime? pickedDate = await showDatePicker(
-                  context: context,
-                  initialDate: currentDate,
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2101),
-                );
+                SizedBox(
+                  width: MediaQuery.sizeOf(context).width * 0.4,
+                  child: TextField(
+                    controller: timeController,
+                    keyboardType: TextInputType.datetime,
+                    decoration: InputDecoration(
+                      hintText: '00:00',
+                      suffixIcon: Icon(Icons.calendar_today),
+                      hintStyle: Theme.of(context)
+                          .textTheme
+                          .bodyMedium!
+                          .copyWith(color: Colors.grey, fontSize: 14),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                    ),
+                    onTap: () async {
+                      TimeOfDay? pickedTime = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                      );
 
-                if (pickedDate != null) {
-                  final TimeOfDay? pickedTime = await showTimePicker(
-                    // ignore: use_build_context_synchronously
-                    context: context,
-                    initialTime: TimeOfDay.fromDateTime(currentDate),
-                  );
-
-                  if (pickedTime != null) {
-                    final DateTime combinedDate = DateTime(
-                      pickedDate.year,
-                      pickedDate.month,
-                      pickedDate.day,
-                      pickedTime.hour,
-                      pickedTime.minute,
-                    );
-
-                    dateController.text =
-                        dateFormatter.format(combinedDate); // Update text field
-                  }
-                }
-              },
+                      if (pickedTime != null) {
+                        final now = DateTime.now();
+                        final selectedTime = DateTime(now.year, now.month,
+                            now.day, pickedTime.hour, pickedTime.minute);
+                        timeController.text =
+                            timeFormatter.format(selectedTime);
+                      }
+                    },
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 30),
+            SizedBox(height: 60),
 
-            // Create Task button
             Center(
               child: ElevatedButton(
                 onPressed: () {
                   final taskTitle = titleController.text;
-                  final taskDueDate = DateTime.parse(dateController.text);
+                  final taskDueDate = dateController.text.trim();
+                  final taskTime = timeController.text.trim();
 
-                  if (taskTitle.isNotEmpty) {
-                    // final newTask = TaskTemplate(
-                    //   title: taskTitle,
-                    //   dueDate: taskDueDate,
-                    // );
-
-                    context.read<TasksBloc>().add(
-                        AddTasksEvent(task: taskTitle, dueDate: taskDueDate));
-                    Navigator.pop(context);
-                  } else {
-                    // Show a snack bar if the title is empty
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Please enter a task title')),
-                    );
+                  if (taskTitle.isEmpty) {
+                    AppToast.show('Please enter a task title');
+                    return;
                   }
+                  if (taskDueDate.isEmpty || taskTime.isEmpty) {
+                    AppToast.show('Please select a due date and time');
+                    return;
+                  }
+
+                  final DateTime dueDateTime =
+                      DateTime.parse('$taskDueDate $taskTime');
+
+                  context.read<TasksBloc>().add(
+                      AddTasksEvent(task: taskTitle, dueDate: dueDateTime));
+                  Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                  backgroundColor: AppColors.onPrimary,
+                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  backgroundColor: const Color.fromARGB(255, 65, 0, 118),
                   shape: RoundedRectangleBorder(
+                    side: BorderSide(
+                        color: const Color.fromARGB(255, 20, 0, 37), width: 2),
                     borderRadius: BorderRadius.circular(20),
                   ),
                 ),
-                child: Text('Create Task'),
+                child: Text(
+                  'Create Task',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
               ),
             ),
           ],
