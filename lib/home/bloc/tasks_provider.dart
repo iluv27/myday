@@ -6,11 +6,13 @@ import 'package:myday/home/services/i_task_service.dart';
 mixin TasksProvider {
   Future<void> writeTask({
     required String title,
+    required String id,
     required DateTime dueDate,
     required bool isTaskDone,
   }) async {
     await ITaskService.instance.createSingleTask(
       title: title,
+      id: id,
       dueDate: dueDate,
       isTaskCompleted: isTaskDone,
     );
@@ -36,7 +38,7 @@ mixin TasksProvider {
     return updated;
   }
 
-  Future deleteTask() async {
-    return await ITaskService.instance.deleteTasks();
+  Future deleteTask({String? id}) async {
+    return await ITaskService.instance.deleteTasks(id: id);
   }
 }

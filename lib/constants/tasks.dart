@@ -1,4 +1,4 @@
-import 'package:myday/home/bloc/tasks_bloc.dart';
+import 'package:uuid/uuid.dart';
 
 class TaskTemplate {
   final String? id;
@@ -17,9 +17,7 @@ class TaskTemplate {
     return {
       'id': id,
       'title': title,
-      'due_time': dueDate is int
-          ? DateTime.fromMillisecondsSinceEpoch(dueDate as int)
-          : DateTime.parse(dueDate as String),
+      'due_time': dueDate?.millisecondsSinceEpoch,
       'status': isTaskCompleted,
     };
   }
@@ -28,9 +26,9 @@ class TaskTemplate {
     return TaskTemplate(
       id: json['id'] as String,
       title: json['title'] as String,
-      dueDate: json['due_time'] is int
-          ? DateTime.fromMillisecondsSinceEpoch(json['due_time'] * 1000)
-          : DateTime.parse(json['due_time']),
+      dueDate: json['due_time'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(json['due_time'])
+          : null, // Convert timestamp to DateTime
       isTaskCompleted: json['status'] as bool,
     );
   }
@@ -47,5 +45,10 @@ class TaskTemplate {
       dueDate: dueDate,
       isTaskCompleted: isTaskCompleted,
     );
+  }
+
+  static String generateId() {
+    var uuid = Uuid();
+    return uuid.v4();
   }
 }

@@ -31,23 +31,18 @@ class TasksBloc extends Bloc<TasksEvent, TasksState> with TasksProvider {
           isTaskDone: event.isTaskCompleted,
         );
 
-        final task = await getTasks();
-
         // // Reorder tasks: Move completed tasks to the bottom
         // task.sort((a, b) {
         //   if (a.isTaskCompleted && !b.isTaskCompleted) return 1;
         //   if (!a.isTaskCompleted && b.isTaskCompleted) return -1;
         //   return 0;
         // });
-        emit(LoadedTasksState(
-          tasks: task,
-        ));
       } catch (e) {
         emit(ErrorTasksState(error: e.toString()));
       }
     });
 
-    on<OptimisticUpdateTasksEvent>((event, emit) {
+    on<OptimisticUpdateTasksEvent>((event, emit) async {
       if (state is LoadedTasksState) {
         final updatedTasks = (state as LoadedTasksState).tasks.map((task) {
           if (task.id == event.id) {
@@ -66,7 +61,7 @@ class TasksBloc extends Bloc<TasksEvent, TasksState> with TasksProvider {
 
     on<DeleteTasksEvent>((event, emit) async {
       try {
-        await deleteTask();
+        await deleteTask(id: event.id);
         final tasks = await getTasks();
 
         emit(LoadedTasksState(tasks: tasks));
@@ -103,14 +98,18 @@ class TasksBloc extends Bloc<TasksEvent, TasksState> with TasksProvider {
   }
 
   Future _addTaskEvent(AddTasksEvent event, Emitter<TasksState> emit) async {
+    emit(LoadingTasksState(isLoading: true));
+
     try {
       await writeTask(
         title: event.task,
+        id: TaskTemplate.generateId(),
         dueDate: event.dueDate,
         isTaskDone: event.isTaskCompleted,
       );
-      emit(LoadingTasksState(isLoading: true));
+
       final tasks = await getTasks();
+      emit(LoadingTasksState());
       emit(LoadedTasksState(tasks: tasks));
     } catch (e) {
       emit(ErrorTasksState(error: e.toString()));

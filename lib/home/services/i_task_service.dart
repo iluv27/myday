@@ -5,8 +5,9 @@ abstract class ITaskService {
   static final ITaskService _instance = TaskService();
 
   static ITaskService get instance => _instance;
-  Future<TaskTemplate> createSingleTask({
+  Future<void> createSingleTask({
     required String title,
+    required String id,
     required DateTime dueDate,
     bool isTaskCompleted = false,
   }) {
@@ -28,7 +29,7 @@ abstract class ITaskService {
     throw UnimplementedError('task unable to be created');
   }
 
-  Future<TaskTemplate> deleteTasks() {
+  Future<TaskTemplate> deleteTasks({String? id}) {
     throw UnimplementedError('task could not be deleted');
   }
 }

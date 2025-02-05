@@ -21,6 +21,34 @@ class HomePage extends StatelessWidget {
     // }
   }
 
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+
+    if (hour >= 5 && hour < 12) {
+      return 'Good Morning!';
+    } else if (hour >= 12 && hour < 17) {
+      return 'Good Afternoon!';
+    } else if (hour >= 17 && hour < 20) {
+      return 'Good Evening!';
+    } else {
+      return 'Good Night!';
+    }
+  }
+
+  String _getGreetingSalutes() {
+    final hour = DateTime.now().hour;
+
+    if (hour >= 5 && hour < 12) {
+      return 'What are we doing today?';
+    } else if (hour >= 12 && hour < 17) {
+      return 'What are we doing today?';
+    } else if (hour >= 17 && hour < 20) {
+      return 'What are we doing tonight?';
+    } else {
+      return 'What are we doing tonight?';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -52,14 +80,14 @@ class HomePage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    'Hello!!',
+                    _getGreeting(),
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
                   SizedBox(
                     height: 10,
                   ),
                   Text(
-                    'What are we doing today?',
+                    _getGreetingSalutes(),
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                   SizedBox(
@@ -71,24 +99,25 @@ class HomePage extends StatelessWidget {
                     ),
                   if (state is LoadedTasksState)
                     state.tasks.isEmpty
-                        ? Container(
-                            padding: EdgeInsets.all(30),
-                            width: double.infinity,
-                            height: 200,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                  width: 1,
-                                  color:
-                                      const Color.fromARGB(255, 88, 158, 255)),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Center(
-                              child: Text(
-                                textAlign: TextAlign.center,
-                                'Write all your tasks for the day. Check them as you go!!',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
+                        ? Padding(
+                            padding: const EdgeInsets.only(bottom: 120.0),
+                            child: Container(
+                              padding: EdgeInsets.all(60),
+                              width: double.infinity,
+                              height: 200,
+                              decoration: BoxDecoration(
+                                border:
+                                    Border.all(width: 1, color: Colors.white),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  textAlign: TextAlign.center,
+                                  'Write all your tasks for the day. Check them as you go!!',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      height: 2),
                                 ),
                               ),
                             ),

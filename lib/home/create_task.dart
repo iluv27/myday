@@ -1,11 +1,9 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myday/constants/toast.dart';
 import 'package:myday/home/bloc/tasks_bloc.dart';
-import 'package:myday/theme/theme.dart';
-import 'package:intl/intl.dart'; // For date formatting
-
-final TextEditingController dateController = TextEditingController();
+import 'package:intl/intl.dart';
 
 class CreateTask extends StatelessWidget {
   const CreateTask({super.key});
@@ -15,13 +13,10 @@ class CreateTask extends StatelessWidget {
     final TextEditingController titleController = TextEditingController();
     final TextEditingController dateController = TextEditingController();
     final TextEditingController timeController = TextEditingController();
-    final DateFormat dateFormatter = DateFormat('yyyy-MM-dd');
+    final DateFormat dateFormatter =
+        DateFormat('yyyy-MM-dd'); // Ensure correct format
     final DateFormat timeFormatter = DateFormat('HH:mm');
-
-    // final DateTime currentDate = DateTime.now();
-    // dateController.text =
-    //     dateFormatter.format(currentDate); // Default current date
-
+    final DateTime currentDate = DateTime.now();
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -101,7 +96,7 @@ class CreateTask extends StatelessWidget {
                   width: MediaQuery.sizeOf(context).width * 0.4,
                   child: TextField(
                       controller: dateController,
-                      keyboardType: TextInputType.datetime,
+                      readOnly: true,
                       decoration: InputDecoration(
                         hintText: '00 - 00 - 00',
                         suffixIcon: Icon(Icons.calendar_today),
@@ -129,20 +124,35 @@ class CreateTask extends StatelessWidget {
                           initialDate: DateTime.now(),
                           firstDate: DateTime(2000),
                           lastDate: DateTime(2101),
+                          helpText: 'Pick a Date',
+                          builder: (context, child) {
+                            return Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: ColorScheme.light(
+                                  primary: Color.fromARGB(
+                                      255, 65, 0, 118), // Header color
+                                  onPrimary:
+                                      Colors.white, // Text color on header
+                                  onSurface:
+                                      Colors.black, // Text color on dialog
+                                ),
+                                dialogBackgroundColor: Colors.white,
+                              ),
+                              child: child!,
+                            );
+                          },
                         );
 
                         if (pickedDate != null) {
-                          dateController.text =
-                              dateFormatter.format(pickedDate);
-                          // ignore: unused_local_variable
-                          final TimeOfDay? pickedTime = await showTimePicker(
-                            // ignore: use_build_context_synchronously
-                            context: context,
-                            initialTime: TimeOfDay.fromDateTime(DateTime.now()),
+                          final DateTime combinedDate = DateTime(
+                            pickedDate.year,
+                            pickedDate.month,
+                            pickedDate.day,
+                            currentDate.hour,
+                            currentDate.minute,
                           );
-
                           dateController.text =
-                              dateFormatter.format(pickedDate);
+                              dateFormatter.format(combinedDate);
                         }
                       }),
                 ),
@@ -150,7 +160,7 @@ class CreateTask extends StatelessWidget {
                   width: MediaQuery.sizeOf(context).width * 0.4,
                   child: TextField(
                     controller: timeController,
-                    keyboardType: TextInputType.datetime,
+                    readOnly: true,
                     decoration: InputDecoration(
                       hintText: '00:00',
                       suffixIcon: Icon(Icons.calendar_today),
@@ -172,17 +182,38 @@ class CreateTask extends StatelessWidget {
                       ),
                     ),
                     onTap: () async {
-                      TimeOfDay? pickedTime = await showTimePicker(
+                      final TimeOfDay? pickedTime = await showTimePicker(
                         context: context,
                         initialTime: TimeOfDay.now(),
+                        hourLabelText: 'Hour',
+                        confirmText: 'Select Time',
+                        minuteLabelText: 'Minutes',
+                        builder: (context, child) {
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              colorScheme: ColorScheme.light(
+                                primary: Color.fromARGB(
+                                    255, 65, 0, 118), // Header color
+                                onPrimary: Colors.white, // Text color on header
+                                onSurface: Colors.black, // Text color on dialog
+                              ),
+                              dialogBackgroundColor: Colors.white,
+                            ),
+                            child: child!,
+                          );
+                        },
                       );
 
                       if (pickedTime != null) {
-                        final now = DateTime.now();
-                        final selectedTime = DateTime(now.year, now.month,
-                            now.day, pickedTime.hour, pickedTime.minute);
+                        final DateTime combinedTime = DateTime(
+                          currentDate.year,
+                          currentDate.month,
+                          currentDate.day,
+                          pickedTime.hour,
+                          pickedTime.minute,
+                        );
                         timeController.text =
-                            timeFormatter.format(selectedTime);
+                            timeFormatter.format(combinedTime);
                       }
                     },
                   ),
@@ -195,23 +226,23 @@ class CreateTask extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () {
                   final taskTitle = titleController.text;
-                  final taskDueDate = dateController.text.trim();
-                  final taskTime = timeController.text.trim();
+                  final taskDueDate = DateTime.parse(
+                      '${dateController.text} ${timeController.text}');
 
                   if (taskTitle.isEmpty) {
                     AppToast.show('Please enter a task title');
                     return;
                   }
-                  if (taskDueDate.isEmpty || taskTime.isEmpty) {
+                  if (dateController.text.isEmpty ||
+                      timeController.text.isEmpty) {
                     AppToast.show('Please select a due date and time');
                     return;
                   }
 
-                  final DateTime dueDateTime =
-                      DateTime.parse('$taskDueDate $taskTime');
+                  log('THIS IS TASK DUE DATE $taskDueDate');
 
                   context.read<TasksBloc>().add(
-                      AddTasksEvent(task: taskTitle, dueDate: dueDateTime));
+                      AddTasksEvent(task: taskTitle, dueDate: taskDueDate));
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
