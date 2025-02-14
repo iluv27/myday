@@ -1,9 +1,13 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myday/home/bloc/tasks_bloc.dart';
 import 'package:myday/home/create_task.dart';
+import 'package:myday/theme/bloc/theme_bloc.dart';
 import 'package:myday/theme/theme.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -64,7 +68,27 @@ class HomePage extends StatelessWidget {
               ),
               actions: [
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    final themeState = context.read<ThemeBloc>().state;
+
+                    if (themeState is ThemeLoadedState) {
+                      // Get the current theme index
+                      final currentThemeIndex =
+                          AppTheme.values.indexOf(themeState.theme);
+
+                      // Get the next theme index
+                      final nextThemeIndex =
+                          (currentThemeIndex + 1) % AppTheme.values.length;
+
+                      // Get the next theme
+                      final nextTheme = AppTheme.values[nextThemeIndex];
+
+                      // Dispatch theme update event
+                      context
+                          .read<ThemeBloc>()
+                          .add(UpdateThemeEvent(appTheme: nextTheme));
+                    }
+                  },
                   icon: Icon(Icons.change_circle_rounded),
                 ),
                 IconButton(

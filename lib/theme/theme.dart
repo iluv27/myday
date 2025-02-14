@@ -25,6 +25,7 @@ ThemeData customTheme = ThemeData(
       onError: AppColors.onError,
       surface: AppColors.surface,
       onSurface: AppColors.onSurface),
+  scaffoldBackgroundColor: const Color.fromARGB(255, 176, 124, 201),
   textTheme: TextTheme(
     headlineMedium: TextStyle(color: Colors.white),
     headlineSmall: TextStyle(color: Colors.white),

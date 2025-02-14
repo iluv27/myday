@@ -9,8 +9,6 @@ import 'package:myday/home/bloc/tasks_provider.dart';
 part 'tasks_event.dart';
 part 'tasks_state.dart';
 
-enum ToggleScheme { toggle }
-
 class TasksBloc extends Bloc<TasksEvent, TasksState> with TasksProvider {
   TasksBloc() : super(InitialTasksState()) {
     on<InitTasksEvent>(_onInit);
